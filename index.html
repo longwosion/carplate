@@ -308,10 +308,13 @@
 
         function getQueryString() {
             var result = location.search.match(new RegExp("[\?][^\?\&]+[^\?\&]+", "g"));
-            for (var i = 0; i < result.length; i++) {
-                result[i] = result[i].substring(1);
+            if(result) {
+                for (var i = 0; i < result.length; i++) {
+                    result[i] = result[i].substring(1);
+                }
+                return result;
             }
-            return result;
+            return ""
         }
 
         $(function(){
