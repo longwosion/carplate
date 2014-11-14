@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>小汽车-车牌预览（在线版）</title>
+        <meta content='width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no' name='viewport'/>
+        <meta http-equiv="Content-Type" content="text/html;charset=utf-8"/>
+        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
+
+        <script src="jquery.min.js"></script>
+
+        <style>
+            .sign {
+                width: 440px;
+                height: 140px;
+                border:0px solid red;
+                box-sizing:border-box;
+                position: relative;
+                border-radius: 10px;
+                margin-bottom:20px;
+            }
+
+            .sign-loop {
+                border:3px solid white;
+                background-color: transparent;
+                box-sizing:border-box;
+                width: 437px;
+                height: 137px;
+                border-radius: 10px;
+                position: absolute;
+                left:1.5px;
+                top:1.5px;
+            }
+
+            .sign.blue, .example.blue{
+                background-color:#001B7A;
+                color:#fff;
+            }
+            .sign.white, .example.white {
+                background-color:#fff;
+                color:#000;
+            }
+            .sign.black, .example.black {
+                background-color:#000;
+                color:#fff;
+            }
+            .sign.yellow, .example.yellow {
+                background-color:#FFBE00;
+                color:#000;
+            }
+
+
+            .sign.blue .sign-loop {
+                border-color:white;
+            }
+            .sign.white .sign-loop {
+                border-color:black;
+            }
+            .sign.black .sign-loop {
+                border-color:white;
+            }
+            .sign.yellow .sign-loop {
+                border-color:black;
+            }            
+    
+            .mark {
+                position: absolute;
+                width:23px; /*15+8*/
+                height:8px;
+                border-radius: 4px;
+                background-color:white;
+            }
+
+            .sign.white .mark{
+                border:1px solid black;
+            }
+
+            .mark1 {
+                left:96px; /*100-4*/
+                top:8.5px; /*12.5-4*/
+            }
+            .mark2 {
+                right:96px; /*100-4*/
+                top:8.5px; /*12.5-4*/
+            }
+            .mark3 {
+                right:96px; /*100-4*/
+                bottom:8.5px; /*12.5-4*/
+            }
+            .mark4 {
+                left:96px; /*100-4*/
+                bottom:8.5px; /*12.5-4*/
+            }
+
+            .symbol {
+                margin-top:25px;
+                margin-right:12px;
+                float:left;
+                width: 45px;
+                height: 90px;
+                color:white;
+                font-size:180px;
+            }
+
+            .symbol.s0 {
+                margin-left: 15.5px;
+            }
+
+            .symbol.s6 {
+                margin-right:0px;
+            }
+
+            .dot {
+                background-color: white;
+                width: 10px;
+                height:10px;
+                border-radius: 10px;
+                margin-top: 65px;
+            }
+
+            .sign.yellow .dot, .sign.white .dot{
+                background-color: black;
+            }
+
+            .sign .number{
+                background-image: url(letter.png)
+            }
+
+            .sign .word{
+                background-image: url(word.png)
+            }
+
+            .sign.yellow .number, .sign.white .number{
+                background-image: url(letter2.png)
+            }
+
+            .sign.yellow .word, .sign.white .word{
+                background-image: url(word2.png)
+            }
+
+            hr {margin:20px 0px;}
+            body {background-color: #ccc}
+
+            .example {
+                padding:4px; border-radius: 4px;
+                border:1px solid #ddd;
+                display:inline-block;
+                cursor: pointer
+            }
+
+        </style>
+
+        <script>
+        function calc_sign_size() {
+            scale = 2
+            var sign_width            = 440,  //外框大小
+                sign_height           = 140,
+                sign_radius           = 10,   //外框圆角半径
+                mark_width            = 15,   //标记点大小
+                mark_radius           = 4,    //标记点圆弧半径
+                mark_margin_top       = 12.5, //标记点偏移
+                mark_margin_left      = 100,
+                sign_loop_margin      = 1.5,  //边框偏移
+                sign_border_width     = 3,
+                symbol_width          = 45,
+                symbol_height         = 90,
+                symbol_width_margin   = 12,
+                symbol_margin_left    = 15.5,
+                dot_size              = 10
+
+            $(".sign").css({
+                "width": sign_width*scale,
+                "height": sign_height*scale,
+                "border-radius": sign_radius*scale
+            })
+
+            $(".mark").css({
+                "width": (mark_width + 2*mark_radius)*scale,
+                "height": 2*mark_radius*scale,
+                "border-radius": mark_radius*scale
+            })
+
+            $(".mark1").css({
+                "left" : (mark_margin_left - mark_radius) * scale,
+                "top"  : (mark_margin_top - mark_radius) * scale
+            })
+
+            $(".mark2").css({
+                "right" : (mark_margin_left - mark_radius) * scale,
+                "top"  : (mark_margin_top - mark_radius) * scale
+            })
+
+            $(".mark3").css({
+                "right" : (mark_margin_left - mark_radius) * scale,
+                "bottom"  : (mark_margin_top - mark_radius) * scale
+            })
+
+            $(".mark4").css({
+                "left" : (mark_margin_left - mark_radius) * scale,
+                "bottom"  : (mark_margin_top - mark_radius) * scale
+            })
+
+            $(".sign-loop").css({
+                "left": sign_loop_margin*scale,
+                "top" : sign_loop_margin*scale,
+                "width": sign_width*scale-2*sign_loop_margin*scale,
+                "height": sign_height*scale-2*sign_loop_margin*scale,                
+                "border-radius": sign_radius*scale,
+                "border-width": sign_border_width*scale
+            })
+
+            $(".symbol").css({
+                "width": symbol_width*scale,
+                "height": symbol_height*scale,
+                "margin-top": scale*(sign_height-symbol_height)*0.5,
+                "margin-right": scale*symbol_width_margin
+            })
+
+            $(".s0").css({"margin-left": scale*symbol_margin_left})
+
+            $(".dot").css({
+                "width": scale*dot_size,
+                "height": scale*dot_size,
+                "border-radius": scale*dot_size,
+                "margin-top": scale*(sign_height-dot_size)*0.5,
+            })
+
+            $(".sign").show()
+
+        }
+
+        var letter="ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890";
+        var word="京津冀晋蒙辽吉黑沪苏浙皖闽赣鲁豫鄂湘粤桂琼渝川贵云藏陕甘青宁新港澳使领学警";
+
+        function is_letter(a) {
+            if (letter.indexOf(a) > -1) {
+                return letter.indexOf(a)
+            }
+        }
+
+        function is_word(a) {
+            return word.indexOf(a)
+        }
+
+        var refreshit = function(code, type) {
+
+            $(".sign").removeClass("blue yellow black white")
+            $(".sign").addClass(type)
+            
+            for(var i=0; i<7; i++) {
+                var c = code[i]
+                var dom = $(".s" + i)
+                dom.removeClass()
+                dom.addClass("symbol s"+i)
+            }
+
+            var len = code.length;
+            for(var i=0; i< len; i++) {
+                var c = code[i]
+                var dom = $(".s" + i)
+                dom.removeClass()
+                dom.addClass("symbol s"+i)
+                if(is_letter(c)>-1) {
+                    dom.addClass("number number"+c)
+                    index = is_letter(c)
+                    if(index<=9) {
+                        dom.css({
+                            "background-position": "-" + (index*90) + "px 0px"
+                        })
+                    } else if(index<=19) {
+                        dom.css({
+                            "background-position": "-" + (index*90-900) + "px -180px"
+                        })
+                    } else if(index<=25) {
+                        dom.css({
+                            "background-position": "-" + (index-20)*90 + "px -360px"
+                        })
+                    } else {
+                        dom.css({
+                            "background-position": "-" + (index-26)*90 + "px -540px"
+                        })                            
+                    }
+                }
+                if(is_word(c)>-1) {
+                    dom.addClass("word word"+is_word(c))
+                    index = is_word(c)
+                    if(index<=8) {
+                        dom.css({
+                            "background-position": "-" + (index*90) + "px 0px"
+                        })
+                    } else if(index<=17) {
+                        dom.css({
+                            "background-position": "-" + (index-9)*90 + "px -180px"
+                        })
+                    } else if(index<=26) {
+                        dom.css({
+                            "background-position": "-" + (index-18)*90 + "px -360px"
+                        })
+                    } else {
+                        dom.css({
+                            "background-position": "-" + (index-27)*90+ "px -540px"
+                        })
+                    }                        
+                }
+            }
+
+            calc_sign_size();            
+        }
+
+        function getQueryString() {
+            var result = location.search.match(new RegExp("[\?][^\?\&]+[^\?\&]+", "g"));
+            for (var i = 0; i < result.length; i++) {
+                result[i] = result[i].substring(1);
+            }
+            return result;
+        }
+
+        $(function(){
+            $("#show").click(function(){
+                var code = $("#code").val()
+                var type = $("#type").val()
+                refreshit(code, type)
+            })
+
+            $(".example").click(function(){
+                var d = $(this).attr("data").split(":")
+                refreshit(d[0], d[1])
+            })
+
+            var query = getQueryString();
+            query = decodeURI(query)
+            if(!query) query = $("#code").val()
+            var type = $("#type").val()
+            refreshit(query, type)
+        })
+
+        </script>
+    </head>
+    <bodd>
+        <h1> 小汽车-车牌预览（在线版）</h1>
+
+        <input id="code" value="GOBUDDY"/> 
+        <select id="type">
+            <option value="blue">蓝色白字</option>
+            <option value="black">黑底白字</option>
+            <option value="yellow">黄底黑字</option>
+            <option value="white">白底黑字</option>
+        </select>
+
+        <input id="show" type="button" value="显示"/>
+
+        <hr>
+        
+        <div>
+            <div class="example yellow" data="京AF0236:yellow">
+                京AF0236
+            </div>
+            <div class="example blue" data="京AF0236:blue">
+                京AF0236
+            </div>
+            <div class="example black" data="使014578:black">
+                使014578
+            </div>
+            <div class="example black" data="沪A0023领:black">
+                沪A0023领
+            </div>       
+            <div class="example black" data="粤ZF023港:black">
+                粤ZF023港
+            </div>    
+            <div class="example yellow" data="京AF023学:yellow">
+                京AF023学
+            </div>
+        </div>
+
+
+
+        <hr>
+
+        <div class="sign" style="display:none">
+            <div class="sign-loop"></div>
+            <div class="mark mark1"></div>
+            <div class="mark mark2"></div>
+            <div class="mark mark3"></div>
+            <div class="mark mark4"></div>
+
+            <div class="symbol s0" ></div>
+            <div class="symbol s1"></div>
+            <div class="symbol dot"></div>
+            <div class="symbol s2"></div>
+            <div class="symbol s3"></div>
+            <div class="symbol s4"></div>
+            <div class="symbol s5"></div>
+            <div class="symbol s6"></div>
+        </div>
+        
+        <div>
+            <b>注解:</b>
+            <p> longwosion#gmail.com</p>
+            <p>
+            文字和图片，参照《GA36--2007》相关说明和尺寸<br/>
+            目前只支持小汽车牌照生成，不考虑支持更多的牌照，不考虑支持导出功能<br/>
+            支持汉字如下：京津冀晋蒙辽吉黑沪苏浙皖闽赣鲁豫鄂湘
+            粤桂琼渝川贵云藏陕甘青宁新港澳使领学警<br/>
+            支持字母如下：ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890
+            </p>
+        </div>
+    </body>
+</html>
