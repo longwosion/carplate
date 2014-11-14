@@ -275,8 +275,13 @@
                             "background-position": "-" + (index-20)*90 + "px -360px"
                         })
                     } else {
+                        var fix = 0
+                        if(c=='7'||c=='8'||c=='0') {
+                            fix = 1
+                        }
+                        if(c=='9') { fix = 2}
                         dom.css({
-                            "background-position": "-" + (index-26)*90 + "px -540px"
+                            "background-position": "-" + ((index-26)*90+fix) + "px -540px"
                         })                            
                     }
                 }
